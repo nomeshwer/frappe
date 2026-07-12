@@ -83,3 +83,51 @@ input.driver-highlighted-element {
 	transform-box: border-box !important;
 	will-change: unset !important;
 }
+
+// Fix for awesomplete dropdown list being covered by driver tour popovers.
+// driver.js highlights the .frappe-control wrapper, and the awesomplete
+// (with its listbox) is a descendant of it — so scope from the highlighted
+// wrapper down to the listbox.
+.driver-highlighted-element .awesomplete > [role="listbox"] {
+	z-index: 1000000001 !important;
+}
+
+// Fix for the field pickers that open UNDER the driver overlay while a tour
+// highlights their field. #driver-page-overlay is a full-screen 25%-black layer
+// at z-index 100002, so any picker below that stacks dimmed/greyed even though
+// the user is meant to type into it. The awesomplete list (above) is a descendant
+// of .driver-highlighted-element and is lifted via that scope, but the date/time,
+// colour and duration pickers are not all descendants (air-datepicker + the colour
+// popover are appended to <body>), so they need lifting on their own.
+//
+// Two independent selectors, kept as SEPARATE rule blocks on purpose — a single
+// comma list would be dropped whole by browsers that don't understand `:has`:
+//   1. body.fah-tour-active — a class the tour adds/removes around itself. Works in
+//      EVERY browser, so it's the reliable path (older mobile Safari / in-app webviews
+//      without `:has` support were leaving these pickers greyed on mobile).
+//   2. body:has(#driver-page-overlay) — needs no JS hook, so it also covers Frappe's
+//      own native FormTour; #driver-page-overlay is removed from the DOM on close, so
+//      the rule only applies while a tour is live. Ignored where `:has` is absent.
+// (Native <select> menus render at the OS layer and need no fix.)
+body.fah-tour-active {
+	.datepickers-container .datepicker,
+	.color-picker-popover,
+	.duration-picker {
+		z-index: 1000000001 !important;
+	}
+}
+
+body:has(#driver-page-overlay) {
+	.datepickers-container .datepicker,
+	.color-picker-popover,
+	.duration-picker {
+		z-index: 1000000001 !important;
+	}
+}
+
+// When the tour popover is repositioned away from its field to avoid overlapping
+// an open dropdown / date-picker (see start_field_tour's dodge logic), its arrow
+// no longer points at anything, so hide it.
+#driver-popover-item.fah-popover-dodged .driver-popover-tip {
+	display: none !important;
+}
