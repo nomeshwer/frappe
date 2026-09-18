@@ -561,7 +561,7 @@ frappe.ui.form.Toolbar = class Toolbar {
 		this.page.add_menu_item(
 			__("Copy to Clipboard"),
 			() => {
-				frappe.utils.copy_to_clipboard(JSON.stringify(this.frm.doc));
+				frappe.utils.copy_to_clipboard(JSON.stringify(this.frm.doc), __("Document copied to clipboard"));
 			},
 			true,
 			"Ctrl+C"

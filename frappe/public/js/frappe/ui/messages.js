@@ -430,14 +430,72 @@ frappe.show_alert = frappe.toast = function (message, seconds = 7, actions = {})
 		$('<div id="dialog-container"><div id="alert-container"></div></div>').appendTo("body");
 	}
 
+	const $alertContainer = $("#alert-container");
+	const rawMsg = (message.message || "").trim();
+	const normMsg = rawMsg.toLowerCase().replace(/[.\s]+$/g, "");
+	const indicator = message.indicator || "blue";
+
+	// 1. Enterprise Deduplication & Coalescing: Prevent duplicate or overlapping toast alerts
+	const $activeAlerts = $alertContainer.find(".desk-alert:not(.out)");
+	let $existing = null;
+
+	$activeAlerts.each(function () {
+		const text = $(this).find(".alert-message").text().trim();
+		const normText = text.toLowerCase().replace(/[.\s]+$/g, "");
+
+		// Exact match deduplication
+		if (normText === normMsg) {
+			$existing = $(this);
+			return false;
+		}
+
+		// Semantic clipboard coalescing: "copied to clipboard" & "document copied to clipboard"
+		const isClipboardCurrent = normText.includes("copied to clipboard");
+		const isClipboardIncoming = normMsg.includes("copied to clipboard");
+		if (isClipboardCurrent && isClipboardIncoming) {
+			$existing = $(this);
+			// Upgrade generic message to more specific message if applicable
+			if (rawMsg.length > text.length) {
+				$(this).find(".alert-message").text(rawMsg);
+			}
+			return false;
+		}
+	});
+
+	if ($existing && $existing.length) {
+		// Existing active toast found -> refresh dismissal timer and pulse, never stack duplicate
+		const existingTimer = $existing.data("dismiss-timer");
+		if (existingTimer) {
+			clearTimeout(existingTimer);
+		}
+		$existing.css({ transition: "transform 0.15s ease", transform: "scale(1.02)" });
+		setTimeout(() => $existing.css({ transform: "none" }), 160);
+
+		if (seconds > 2) {
+			seconds = seconds - 0.8;
+		}
+		const newTimer = setTimeout(() => {
+			$existing.addClass("out");
+			setTimeout(() => $existing.remove(), 800);
+		}, seconds * 1000);
+		$existing.data("dismiss-timer", newTimer);
+
+		return $existing;
+	}
+
+	// 2. Capacity Containment: Max 3 visible alerts at once
+	if ($activeAlerts.length >= 3) {
+		const $oldest = $activeAlerts.first();
+		$oldest.addClass("out");
+		setTimeout(() => $oldest.remove(), 400);
+	}
+
 	let icon;
 	if (message.indicator) {
 		icon = indicator_icon_map[message.indicator.toLowerCase()] || "solid-" + message.indicator;
 	} else {
 		icon = "solid-info";
 	}
-
-	const indicator = message.indicator || "blue";
 
 	const div = $(`
 		<div class="alert desk-alert ${indicator}" role="alert">
@@ -474,11 +532,12 @@ frappe.show_alert = frappe.toast = function (message, seconds = 7, actions = {})
 		seconds = seconds - 0.8;
 	}
 
-	setTimeout(() => {
+	const timer = setTimeout(() => {
 		div.addClass("out");
 		setTimeout(() => div.remove(), 800);
 		return false;
 	}, seconds * 1000);
+	div.data("dismiss-timer", timer);
 
 	return div;
 };
