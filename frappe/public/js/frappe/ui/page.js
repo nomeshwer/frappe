@@ -519,7 +519,7 @@ frappe.ui.Page = class Page {
 		} else {
 			shortcut_obj = shortcut;
 		}
-		shortcut_obj.shortcut_label = frappe.ui.keys.get_shortcut_label(shortcut_obj.shortcut);
+		shortcut_obj.shortcut_label = shortcut_obj.shortcut_label || frappe.ui.keys.get_shortcut_label(shortcut_obj.shortcut);
 
 		// actual shortcut string
 		shortcut_obj.shortcut = shortcut_obj.shortcut.toLowerCase();

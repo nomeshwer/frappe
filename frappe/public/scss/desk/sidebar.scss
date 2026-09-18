@@ -1,13 +1,13 @@
 // clean-this-file
 :root {
-	--sidebar-hover-color: #f3f3f3;
+	--sidebar-hover-color: rgba(0, 0, 0, 0.07);
 	--sidebar-active-color: rgba(255, 255, 255, 1);
 	--sidebar-border-color: #ededed;
 	--divider-color: rgba(237, 237, 237, 1);
 	--sidebar-width: 220px;
 }
 [data-theme="dark"] {
-	--sidebar-hover-color: rgba(43, 43, 43, 1);
+	--sidebar-hover-color: rgba(255, 255, 255, 0.12);
 	--sidebar-active-color: rgba(66, 66, 66, 1);
 	--sidebar-border-color: #232323;
 	--divider-color: rgba(52, 52, 52, 1);
@@ -85,9 +85,12 @@
 	.standard-sidebar-item {
 		display: flex;
 		position: relative;
-		@include transition(all, 0.3s, cubic-bezier(0.4, 0, 0.2, 1));
+		border-radius: 8px;
+		cursor: pointer;
+		width: 100%;
+		@include transition(all, 0.15s, cubic-bezier(0.4, 0, 0.2, 1));
 
-		margin-bottom: 1px;
+		margin-bottom: 2px;
 		.sidebar-item-control {
 			.drop-icon {
 				width: 28px;
@@ -96,8 +99,10 @@
 			}
 		}
 
-		&:not(.active-sidebar):has(a:not(.section-break)):hover {
+		&:not(.active-sidebar):hover,
+		&:not(.active-sidebar):focus-within {
 			@include hover-mixin();
+			cursor: pointer;
 		}
 
 		.sidebar-item-label {
@@ -106,7 +111,7 @@
 			display: block;
 			flex: 1 1 auto;
 			align-items: center;
-			@include transition(all, 0.3s, cubic-bezier(0.4, 0, 0.2, 1));
+			@include transition(all, 0.15s, cubic-bezier(0.4, 0, 0.2, 1));
 			cursor: pointer;
 		}
 		.item-anchor {
@@ -114,17 +119,20 @@
 			display: flex;
 			gap: 2px;
 			align-items: center;
-			// padding: 3px 0px 3px 11px;
 			flex: 1;
-			height: 28px;
+			min-height: 32px;
+			height: 32px;
 			color: var(--ink-gray-6);
 			text-decoration: none;
-			@include transition(all, 0.3s, cubic-bezier(0.4, 0, 0.2, 1));
+			cursor: pointer;
+			border-radius: 8px;
+			@include transition(all, 0.15s, cubic-bezier(0.4, 0, 0.2, 1));
 			.sidebar-item-icon {
-				padding: 7px;
+				padding: 0 7px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				cursor: pointer;
 			}
 		}
 	}

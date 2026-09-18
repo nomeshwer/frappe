@@ -342,6 +342,13 @@ select.input-xs {
 .dropdown-item {
 	border-radius: 8px;
 	padding: var(--dropdown-padding) !important;
+	&:focus,
+	&:focus-visible {
+		outline: none !important;
+		box-shadow: inset 0 0 0 2px var(--primary, var(--text-color, #171717)) !important;
+		background-color: var(--sidebar-hover-color, var(--fg-hover-color, rgba(36, 144, 239, 0.08))) !important;
+		color: var(--text-color, inherit) !important;
+	}
 }
 
 .dropdown-menu {

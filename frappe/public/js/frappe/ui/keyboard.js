@@ -23,11 +23,20 @@ frappe.ui.keys.setup = function () {
 let standard_shortcuts = [];
 frappe.ui.keys.standard_shortcuts = standard_shortcuts;
 frappe.ui.keys.get_shortcut_label = function (shortcut) {
+	if (!shortcut) return "";
 	let label = shortcut.split("+").map(frappe.utils.to_title_case).join("+");
 	if (frappe.utils.is_mac()) {
-		label = label.replace("Ctrl", "⌘").replace("Alt", "⌥");
+		label = label
+			.replace(/Ctrl\+/gi, "⌘")
+			.replace(/Cmd\+/gi, "⌘")
+			.replace(/Alt\+/gi, "⌥")
+			.replace(/Shift\+/gi, "⇧")
+			.replace(/Ctrl/gi, "⌘")
+			.replace(/Cmd/gi, "⌘")
+			.replace(/Alt/gi, "⌥")
+			.replace(/Shift/gi, "⇧");
 	}
-	return label.replace("Shift", "⇧");
+	return label;
 };
 frappe.ui.keys.add_shortcut = ({
 	shortcut,

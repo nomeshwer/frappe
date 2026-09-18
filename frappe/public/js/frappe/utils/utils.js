@@ -303,7 +303,17 @@ Object.assign(frappe.utils, {
 		return content.html();
 	},
 	scroll_page_to_top() {
-		$(".main-section").scrollTop(0);
+		const prefersReducedMotion =
+			typeof window !== "undefined" &&
+			window.matchMedia &&
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		const $targets = $(".main-section, .layout-main-section, html, body");
+		if (prefersReducedMotion) {
+			$targets.scrollTop(0);
+		} else {
+			$targets.stop().animate({ scrollTop: 0 }, 200);
+		}
 	},
 	scroll_to: function (
 		element,

@@ -79,6 +79,14 @@
 			align-items: center;
 			gap: 6px;
 		}
+		&:focus,
+		&:focus-visible {
+			outline: none !important;
+			box-shadow: 0 0 0 2px var(--primary, var(--text-color, #171717)) !important;
+			border-color: var(--primary, var(--text-color, #171717)) !important;
+			position: relative !important;
+			z-index: 5 !important;
+		}
 	}
 	.btn:not(.icon-btn) {
 		padding: 4px 8px;
@@ -106,6 +114,24 @@ body[data-route^="Form"] {
 	.layout-main-section-wrapper {
 		width: calc(100% - var(--form-sidebar-width));
 		flex: calc(100% - var(--form-sidebar-width));
+		transition: width 0.2s ease, flex 0.2s ease;
+	}
+
+	.layout-main.hide-sidebar .layout-main-section-wrapper,
+	.layout-main-section-wrapper.full-width {
+		width: 100% !important;
+		flex: 1 0 100% !important;
+	}
+
+	.layout-side-section.hide-sidebar,
+	.layout-side-section.hide {
+		display: none !important;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.layout-main-section-wrapper {
+			transition: none !important;
+		}
 	}
 }
 

@@ -418,7 +418,11 @@ frappe.ui.form.Toolbar = class Toolbar {
 				this.show_jump_to_field_dialog();
 			},
 			true,
-			{ shortcut: "Ctrl+J", ignore_inputs: true }
+			{
+				shortcut: "Ctrl+J",
+				shortcut_label: "/ · " + frappe.ui.keys.get_shortcut_label("Ctrl+J"),
+				ignore_inputs: true,
+			}
 		);
 	}
 
@@ -429,7 +433,8 @@ frappe.ui.form.Toolbar = class Toolbar {
 				() => {
 					this.show_linked_with();
 				},
-				true
+				true,
+				"Shift+L"
 			);
 		}
 	}
@@ -479,9 +484,14 @@ frappe.ui.form.Toolbar = class Toolbar {
 		this.page.add_menu_item(
 			__("Toggle Sidebar"),
 			() => {
-				this.setup_sidebar_toggle(this.frm.sidebar.sidebar.parent());
+				if (frappe.ui.desk_a11y && frappe.ui.desk_a11y.toggle_document_sidebar) {
+					frappe.ui.desk_a11y.toggle_document_sidebar(true);
+				} else {
+					this.setup_sidebar_toggle(this.frm.sidebar.sidebar.parent());
+				}
 			},
-			true
+			true,
+			"Shift+\\"
 		);
 	}
 
@@ -492,7 +502,8 @@ frappe.ui.form.Toolbar = class Toolbar {
 			() => {
 				this.frm.reload_doc();
 			},
-			true
+			true,
+			"R"
 		);
 	}
 
@@ -552,7 +563,8 @@ frappe.ui.form.Toolbar = class Toolbar {
 			() => {
 				frappe.utils.copy_to_clipboard(JSON.stringify(this.frm.doc));
 			},
-			true
+			true,
+			"Ctrl+C"
 		);
 	}
 
@@ -959,10 +971,12 @@ frappe.ui.form.Toolbar = class Toolbar {
 	setup_sidebar_toggle(sidebar_wrapper) {
 		if (frappe.utils.is_xs() || frappe.utils.is_sm()) {
 			this.setup_overlay_sidebar(sidebar_wrapper);
+		} else if (frappe.ui.desk_a11y && frappe.ui.desk_a11y.toggle_document_sidebar) {
+			frappe.ui.desk_a11y.toggle_document_sidebar(true);
 		} else {
 			sidebar_wrapper.toggle();
+			$(document.body).trigger("toggleSidebar");
 		}
-		$(document.body).trigger("toggleSidebar");
 	}
 
 	setup_overlay_sidebar(sidebar_wrapper) {
